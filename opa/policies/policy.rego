@@ -5,7 +5,6 @@ import future.keywords.if
 
 default decision := {"allow": false, "reason": "Denied by default"}
 
-allowed_callers := {"dashboard-service", "postman"}
 allowed_purposes := {"PROMOTION", "ANALYTICS"}
 
 token_uri := opa.runtime().env.OPA_KEYCLOAK_TOKEN_URI
@@ -64,7 +63,6 @@ decision_has_active_consent(category) if {
 # ── PROMOTION / CREATE (requires PERSONAL_DATA consent) ──
 decision := {"allow": true, "reason": "Access granted"} if {
     "PROMOTION_READ" in input.caller.roles
-    input.caller.clientId in allowed_callers
     input.purpose in allowed_purposes
     input.resource == "PROMOTION"
     input.action == "CREATE"
@@ -77,7 +75,6 @@ decision := {"allow": true, "reason": "Access granted"} if {
 # ── PROMOTION / READ (no consent needed for listing, but role required) ──
 decision := {"allow": true, "reason": "Access granted"} if {
     "PROMOTION_READ" in input.caller.roles
-    input.caller.clientId in allowed_callers
     input.purpose in allowed_purposes
     input.resource == "PROMOTION"
     input.action == "READ"
@@ -86,7 +83,6 @@ decision := {"allow": true, "reason": "Access granted"} if {
 # ── PROMOTION / READ with PERSONAL_DATA ──
 decision := {"allow": true, "reason": "Access granted"} if {
     "PROMOTION_READ" in input.caller.roles
-    input.caller.clientId in allowed_callers
     input.purpose in allowed_purposes
     input.resource == "PROMOTION"
     input.action == "READ"
@@ -101,20 +97,13 @@ decision := {"allow": false, "reason": "Caller does not have PROMOTION_READ role
     not ("PROMOTION_READ" in input.caller.roles)
 }
 
-decision := {"allow": false, "reason": "Caller not authorized"} if {
-    "PROMOTION_READ" in input.caller.roles
-    not input.caller.clientId in allowed_callers
-}
-
 decision := {"allow": false, "reason": "Purpose not allowed"} if {
     "PROMOTION_READ" in input.caller.roles
-    input.caller.clientId in allowed_callers
     not input.purpose in allowed_purposes
 }
 
 decision := {"allow": false, "reason": "Active consent not found"} if {
     "PROMOTION_READ" in input.caller.roles
-    input.caller.clientId in allowed_callers
     input.purpose in allowed_purposes
     input.resource == "PROMOTION"
     "PERSONAL_DATA" in input.dataCategories
