@@ -26,6 +26,9 @@ spring:
           keycloak:
             token-uri: ${KEYCLOAK_TOKEN_URI}
 
+user-service:
+  url: ${USER_SERVICE_URL}
+
 tcc:
   security:
     enabled: true

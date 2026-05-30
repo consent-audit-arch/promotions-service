@@ -8,6 +8,8 @@ import java.time.LocalDate;
 
 public class PromotionRequest {
     @NotBlank
+    private String dataSubjectId;
+    @NotBlank
     private String name;
     private String description;
     @NotNull
@@ -18,6 +20,8 @@ public class PromotionRequest {
     @NotBlank
     private String targetSegment;
 
+    public String getDataSubjectId() { return dataSubjectId; }
+    public void setDataSubjectId(String dataSubjectId) { this.dataSubjectId = dataSubjectId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }

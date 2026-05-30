@@ -42,6 +42,9 @@ management:
       exposure:
         include: health,info
 
+user-service:
+  url: ${USER_SERVICE_URL:http://localhost:8083}
+
 tcc:
   security:
     enabled: true
