@@ -33,7 +33,7 @@ public class PromotionController {
             @Valid @RequestBody PromotionRequest request,
             HttpServletRequest httpRequest) {
         String purpose = httpRequest.getHeader("X-Purpose");
-        String correlationId = httpRequest.getHeader("X-Correlation-Id");
+        String correlationId = resolveCorrelationId(httpRequest);
         PromotionResponse response = promotionService.create(request, purpose, correlationId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -46,7 +46,7 @@ public class PromotionController {
             @Valid @RequestBody BatchPromotionEvaluateRequest request,
             HttpServletRequest httpRequest) {
         String purpose = httpRequest.getHeader("X-Purpose");
-        String correlationId = httpRequest.getHeader("X-Correlation-Id");
+        String correlationId = resolveCorrelationId(httpRequest);
         BatchPromotionEvaluateResponse response = promotionService.evaluateBatch(
                 request.getIds(), purpose, correlationId);
         return ResponseEntity.ok(response);
@@ -77,7 +77,15 @@ public class PromotionController {
             @PathVariable Long userId,
             HttpServletRequest request) {
         String purpose = request.getHeader("X-Purpose");
-        String correlationId = request.getHeader("X-Correlation-Id");
+        String correlationId = resolveCorrelationId(request);
         return ResponseEntity.ok(promotionService.findWithProfile(userId, purpose, correlationId));
+    }
+
+    private static String resolveCorrelationId(HttpServletRequest request) {
+        String correlationId = (String) request.getAttribute("tcc-correlation-id");
+        if (correlationId != null) return correlationId;
+        correlationId = request.getHeader("X-Correlation-Id");
+        if (correlationId != null && !correlationId.isBlank()) return correlationId;
+        return java.util.UUID.randomUUID().toString();
     }
 }
