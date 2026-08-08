@@ -24,6 +24,15 @@ public class UserServiceClient {
     private final RestClient restClient;
     private final OAuth2AuthorizedClientManager authorizedClientManager;
 
+    private static RuntimeException mapUserServiceError(org.springframework.http.HttpStatusCode status, Long userId) {
+        if (status.isSameCodeAs(org.springframework.http.HttpStatus.FORBIDDEN)) {
+            return new com.tcc.security.exception.DataAccessDeniedException(
+                    "Acesso negado pelo serviço de dados do titular para o usuário " + userId);
+        }
+        return new UserServiceCommunicationException(
+                "User service returned " + status + " for user " + userId, null);
+    }
+
     public UserServiceClient(@Value("${user-service.url}") String userServiceUrl,
                              OAuth2AuthorizedClientManager authorizedClientManager) {
         this.restClient = RestClient.builder()
@@ -46,9 +55,7 @@ public class UserServiceClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new UserServiceCommunicationException(
-                            "User service returned " + response.getStatusCode() + " for user " + userId,
-                            null);
+                    throw mapUserServiceError(response.getStatusCode(), userId);
                 })
                 .body(new org.springframework.core.ParameterizedTypeReference<>() {});
     }
@@ -63,15 +70,12 @@ public class UserServiceClient {
                 .header("Authorization", "Bearer " + token)
                 .header("X-Purpose", purpose)
                 .header("X-Data-Categories", "PERSONAL_DATA")
-                .header("X-Data-Category", "PERSONAL_DATA")
                 .header("X-Data-Subject-Id", String.valueOf(userId))
                 .header("X-Correlation-Id", correlationId)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new UserServiceCommunicationException(
-                            "User service returned " + response.getStatusCode() + " for user " + userId,
-                            null);
+                    throw mapUserServiceError(response.getStatusCode(), userId);
                 })
                 .body(UserProfileResponse.class);
     }
@@ -109,7 +113,6 @@ public class UserServiceClient {
                 .header("Authorization", "Bearer " + token)
                 .header("X-Purpose", purpose)
                 .header("X-Data-Categories", "USAGE_DATA")
-                .header("X-Data-Category", "USAGE_DATA")
                 .header("X-Data-Subject-Ids", String.join(",", ids.stream().map(String::valueOf).toList()))
                 .header("X-Correlation-Id", correlationId)
                 .body(Map.of("ids", ids))
