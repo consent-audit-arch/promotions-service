@@ -10,4 +10,5 @@ import java.util.List;
 public interface PromotionJpaRepository extends JpaRepository<PromotionJpaEntity, Long> {
     List<PromotionJpaEntity> findByTargetSegment(String targetSegment);
     List<PromotionJpaEntity> findByStatus(String status);
+    List<PromotionJpaEntity> findByDataSubjectId(Long dataSubjectId);
 }

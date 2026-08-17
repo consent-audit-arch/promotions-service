@@ -53,7 +53,11 @@ public class PromotionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PromotionResponse>> findAll() {
+    public ResponseEntity<List<PromotionResponse>> findAll(
+            @RequestParam(name = "dataSubjectId", required = false) Long dataSubjectId) {
+        if (dataSubjectId != null) {
+            return ResponseEntity.ok(promotionService.findByDataSubjectId(dataSubjectId));
+        }
         return ResponseEntity.ok(promotionService.findAll());
     }
 

@@ -36,6 +36,9 @@ public class PromotionJpaEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "data_subject_id")
+    private Long dataSubjectId;
+
     @PrePersist
     protected void onCreate() {
         createdAt = Instant.now();
@@ -60,4 +63,6 @@ public class PromotionJpaEntity {
     public void setStatus(String status) { this.status = status; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Long getDataSubjectId() { return dataSubjectId; }
+    public void setDataSubjectId(Long dataSubjectId) { this.dataSubjectId = dataSubjectId; }
 }

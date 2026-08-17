@@ -14,6 +14,7 @@ public class PromotionResponse {
     private String targetSegment;
     private String status;
     private Instant createdAt;
+    private Long dataSubjectId;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -33,4 +34,6 @@ public class PromotionResponse {
     public void setStatus(String status) { this.status = status; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Long getDataSubjectId() { return dataSubjectId; }
+    public void setDataSubjectId(Long dataSubjectId) { this.dataSubjectId = dataSubjectId; }
 }

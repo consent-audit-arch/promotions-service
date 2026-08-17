@@ -46,6 +46,7 @@ public class PromotionService {
         entity.setStartDate(request.getStartDate());
         entity.setEndDate(request.getEndDate());
         entity.setTargetSegment(request.getTargetSegment());
+        entity.setDataSubjectId(Long.parseLong(request.getDataSubjectId()));
         PromotionJpaEntity saved = repository.save(entity);
         return toResponse(saved);
     }
@@ -88,6 +89,13 @@ public class PromotionService {
     }
 
     @Transactional(readOnly = true)
+    public List<PromotionResponse> findByDataSubjectId(Long dataSubjectId) {
+        return repository.findByDataSubjectId(dataSubjectId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public PromotionResponse findById(Long id) {
         PromotionJpaEntity entity = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Promotion not found: " + id));
@@ -107,7 +115,7 @@ public class PromotionService {
 
         UserProfileResponse profile = userServiceClient.fetchUserProfile(userId, purpose, resolvedCorrelationId);
         List<UserUsageProfileDTO> usageData = userServiceClient.fetchUsageData(userId, purpose, resolvedCorrelationId);
-        List<PromotionResponse> availablePromotions = findAll();
+        List<PromotionResponse> availablePromotions = findByDataSubjectId(userId);
 
         return new PromotionWithProfileResponse(profile, usageData, availablePromotions);
     }
@@ -123,6 +131,7 @@ public class PromotionService {
         response.setTargetSegment(entity.getTargetSegment());
         response.setStatus(entity.getStatus());
         response.setCreatedAt(entity.getCreatedAt());
+        response.setDataSubjectId(entity.getDataSubjectId());
         return response;
     }
 }
